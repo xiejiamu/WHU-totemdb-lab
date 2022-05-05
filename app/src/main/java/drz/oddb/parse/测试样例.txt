@@ -1,0 +1,41 @@
+CREATE CLASS userA(id1 int, name1 char, money1 int);
+INSERT INTO userA VALUES (1,"a",1000);
+INSERT INTO userA VALUES (2,"b",1000);
+INSERT INTO userA VALUES (3,"c",3000);
+
+CREATE CLASS userB(id2 char, name2 char, money2 int);
+INSERT INTO userB VALUES (2,"b",1000);
+INSERT INTO userB VALUES (4,"d",1000);
+INSERT INTO userB VALUES (5,"e",1000);
+INSERT INTO userB VALUES (6,"f",1000);
+
+CREATE UNIONDEPUTY un SELECT id1 AS userid,name1 AS name,money1 AS money FROM userA WHERE money1=1000 UNION SELECT id2 AS userid,name2 AS name,money2 AS money FROM userB WHERE money2=1000;
+
+INSERT INTO userA VALUES (7,"g",1000);
+// 这一条需要实现效果：在userA中插入记录，在un中同时加入这条记录。
+// SELECT验证
+SELECT userid AS userid,name AS name,money AS money FROM un WHERE money=1000;
+
+DELETE FROM userB WHERE name2="f";
+// 这一条需要实现效果：在userB中删除记录，在un中同时删除这条记录。
+// SELECT验证
+SELECT userid AS userid,name AS name,money AS money FROM un WHERE money=1000;
+// 不应该包含有f的记录
+
+UPDATE userA SET money1=1000 WHERE name1="c";
+// 这一条需要实现效果：在userA中修改记录，使它满足代理类条件，在un中加入这条记录。
+// SELECT验证
+SELECT userid AS userid,name AS name,money AS money FROM un WHERE money=1000;
+// 应该包含有c的记录
+
+UPDATE userA SET money1=3000 WHERE name1="a";
+// 这一条需要实现效果：在userA中修改记录，使它不再满足代理类条件，在un中删除这条记录。
+// SELECT验证
+
+SELECT userid AS userid,name AS name,money AS money FROM un WHERE money=3000;
+// 应该为空
+
+
+
+
+
